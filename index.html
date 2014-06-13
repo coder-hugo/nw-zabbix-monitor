@@ -1,0 +1,38 @@
+<html>
+	<head>
+		<title>Desktop Notification Demo</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+	</head>
+	<body>
+	<h1>Zabbix Montitor</h1>
+  <label for="username">Username:</label>
+  <input id="username" type="text" />
+  <br/>
+  <label for="password">Passwort:</label>
+  <input id="password" type="password" />
+  <br/>
+  <button id="login">Login</button>
+  <button id="logout">Logout</button>
+  <ul id="trigger"></ul>
+
+  <script type="text/javascript">
+    var zabbix = require('./lib/zabbix.js');
+    var client = new zabbix.Zabbix({host: 'sandbox', port: 80, path: '/zabbix/api_jsonrpc.php'});
+    $(document).ready(function() {
+      $('#login').on('click', function() {
+        client.login($('#username').val(), $('#password').val(), function() {
+          client.getTrigger(function(res) {
+            $('#trigger').show();
+            res.result.forEach(function(item) {
+              $('#trigger').append('<li>' + item.description + '</li>');
+            });
+          });
+        });
+      });
+      $('#logout').on('click', function() {
+        client.logout();
+      });
+    });
+  </script>
+	</body>
+</html>
