@@ -1,38 +1,39 @@
 <html>
-	<head>
-		<title>Desktop Notification Demo</title>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-	</head>
-	<body>
-	<h1>Zabbix Montitor</h1>
-  <label for="username">Username:</label>
-  <input id="username" type="text" />
-  <br/>
-  <label for="password">Passwort:</label>
-  <input id="password" type="password" />
-  <br/>
-  <button id="login">Login</button>
-  <button id="logout">Logout</button>
-  <ul id="trigger"></ul>
+  <head>
+    <title>Zabbix monitor</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+  </head>
+  <body>
 
   <script type="text/javascript">
+    var gui = require('nw.gui');
+    var win = gui.Window.get();
     var zabbix = require('./lib/zabbix.js');
-    var client = new zabbix.Zabbix({host: 'sandbox', port: 80, path: '/zabbix/api_jsonrpc.php'});
-    $(document).ready(function() {
-      $('#login').on('click', function() {
-        client.login($('#username').val(), $('#password').val(), function() {
-          client.getTrigger(function(res) {
-            $('#trigger').show();
-            res.result.forEach(function(item) {
-              $('#trigger').append('<li>' + item.description + '</li>');
-            });
+    var secretsProvider = require('./lib/secrets.js');
+    var secrets = secretsProvider.loadSecrets();
+    var storage = require('./lib/storage.js').storage;
+    var triggerFilter = storage.getJSONItem('triggerFilter');
+    var common = storage.getJSONItem('common');
+    if (secrets && triggerFilter && common) {
+      zabbix.connect(secrets.url, secrets.username, secrets.password, function() {
+        var triggerWin = gui.Window.open('html/triggers.html');
+        var updateTriggers = function() { 
+          zabbix.retrieveTriggers(triggerFilter, function() {
+            triggerWin.reload();
           });
-        });
+        };
+        setInterval(updateTriggers, common.updateInterval * 60000);
+        updateTriggers();
       });
-      $('#logout').on('click', function() {
-        client.logout();
-      });
+    } else {
+      gui.Window.open('html/settings.html');
+    }
+    win.on('close', function() {
+      if (zabbix.isConnected()) {
+        zabbix.disconnect();
+      }
+      this.close(true);
     });
   </script>
-	</body>
+  </body>
 </html>
