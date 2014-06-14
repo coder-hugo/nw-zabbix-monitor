@@ -1,22 +1,23 @@
 {
-	"main": "index.html",
-	"name": "nw-zabbix-monitor",
-	"description": "",
-	"version": "0.0.1",
-	"keywords": [ "node-webkit", "Desktop Notifications" ],
-	"window": {
-		"toolbar": false,
-		"width": 640,
-		"height": 480,
-		"position": "mouse",
-		"min_width": 400,
-		"min_height": 200
-	},
-	"webkit": {
-		"plugin": true,
-		"page-cache": false
-	},
+  "main": "index.html",
+  "name": "nw-zabbix-monitor",
+  "description": "",
+  "version": "0.0.1",
+  "keywords": [ "node-webkit", "Desktop Notifications" ],
+  "window": {
+    "toolbar": false,
+    "width": 640,
+    "height": 480,
+    "position": "mouse",
+    "min_width": 400,
+    "min_height": 200
+  },
+  "webkit": {
+    "plugin": true,
+    "page-cache": false
+  },
   "dependencies": {
-    "node-json-rpc": ">= 0.0.1"
-	}
+    "node-json-rpc": ">= 0.0.1",
+    "node-localstorage": ">= 0.3.4"
+  }
 }
