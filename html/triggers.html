@@ -1,0 +1,52 @@
+<html>
+  <head>
+    <title>Zabbix monitor - Trigger</title>
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+    <script src="../jquery/jquery.min.js"></script>
+    <script src="../bootstrap/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+  <div class="container-fluid" style="padding-top: 10px" id="container">
+  </div>
+  <style type="text/css">
+    /* FIXME add colorscheme for the diffent trigger priorities similar to the zabbix colorscheme */
+    .alert-average {
+      border-color: orange;
+      background-color: orange;
+      color: black;
+    }
+  </style>
+  <script type="text/javascript">
+    var zabbix = require('./lib/zabbix.js');
+    $(document).ready(function() {
+      var triggerList = $('#container');
+      triggerList.empty();
+      var triggers = zabbix.getTriggerCache();
+      if (triggers) {
+        triggers.forEach(function(trigger) {
+          var severityClass;
+          console.log(trigger.priority);
+          switch (trigger.priority) {
+            case '1':
+              severityClass = 'alert-information';
+              break;
+            case '2':
+              severityClass = 'alert-warning';
+              break;
+            case '3':
+              severityClass = 'alert-average';
+              break;
+            case '4':
+              severityClass = 'alert-high';
+              break;
+            case '5':
+              severityClass = 'alert-disaster';
+              break;
+          }
+          triggerList.append('<div class="alert ' + severityClass + '">' + trigger.description + '</div>');
+        });
+      }
+    });
+  </script>
+  </body>
+</html>
