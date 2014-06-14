@@ -1,0 +1,78 @@
+<html>
+  <head>
+    <title>Zabbix monitor - Settings</title>
+    <link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
+    <script src="../jquery/jquery.min.js"></script>
+    <script src="../bootstrap/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+  <div class="container-fluid" style="padding-top: 10px">
+    <form>
+      <div class="panel panel-default">
+        <div class="panel-heading">Credentials</div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label for="url" class="control-label">Zabbix-URL:</label>
+            <input class="form-control" id="url" type="url" />
+          </div>
+          <div class="form-group">
+            <label for="username" class="control-label">Username:</label>
+            <input class="form-control" id="username" type="text" />
+          </div>
+          <div class="from-group">
+            <label for=password" class="control-label">Password:</label>
+            <input class="form-control" id="password" type="password" />
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">Common stuff</div>
+        <div class="panel-body">
+          <div class="checkbox">
+            <label>
+              <input id="unacknowlegedEvents" type="checkbox" >
+              Show only unacknowleged Events
+            </label>
+          </div>
+        </div>
+      </div>
+      <button id="save" class="btn btn-primary pull-right">Save</button>
+      <button id="cancel" class="btn btn-default pull-left">Cancel</button>
+    </form>
+  </div>
+  <script type="text/javascript">
+    var gui = require('nw.gui');
+    var win = gui.Window.get();
+    var secretsProvider = require('./lib/secrets.js');
+    var storage = require('./lib/storage.js').storage;
+
+    $(document).ready(function() {
+      var secrets = secretsProvider.loadSecrets();
+      if (secrets) {
+        $('#url').val(secrets.url);
+        $('#username').val(secrets.username);
+        $('#password').val(secrets.password);
+      }
+      secrets = null;
+      var commonStuff = storage.getJSONItem('commonStuff');
+      if (commonStuff) {
+        $('#unacknowlegedEvents').attr('checked', commonStuff.unacknowlegedEvents);
+      }
+      $('#cancel').on('click', function() {
+        win.close();
+      });
+      $('#save').on('click', function() {
+        secretsProvider.saveSecrets({
+          url: $('#url').val(),
+          username: $('#username').val(),
+          password: $('#password').val()
+        });
+        storage.setJSONItem('commonStuff', {
+          unacknowlegedEvents: $('#unacknowlegedEvents').is(':checked')
+        });
+        win.close();
+      });
+    });
+  </script>
+  </body>
+</html>
