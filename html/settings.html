@@ -20,7 +20,7 @@
             <input class="form-control" id="username" type="text" />
           </div>
           <div class="from-group">
-            <label for=password" class="control-label">Password:</label>
+            <label for="password" class="control-label">Password:</label>
             <input class="form-control" id="password" type="password" />
           </div>
         </div>
@@ -39,6 +39,18 @@
               <input id="skipDependent" type="checkbox" >
               Don't show dependent triggers
             </label>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">Common</div>
+        <div class="panel-body">
+          <div class="from-group">
+            <label for="updateInterval" class="control-label">Update interval:</label>
+            <div class="input-group">
+              <input class="form-control text-right" id="updateInterval" type="number" min="1" value="5" />
+              <span class="input-group-addon">min</span>
+            </div>
           </div>
         </div>
       </div>
@@ -65,6 +77,10 @@
         $('#unacknowlegedEvents').attr('checked', triggerFilter.unacknowlegedEvents);
         $('#skipDependent').attr('checked', triggerFilter.skipDependent);
       }
+      var common = storage.getJSONItem('common');
+      if (common) {
+        $('#updateInterval').val(common.updateInterval);
+      }
       $('#cancel').on('click', function() {
         win.close();
       });
@@ -77,6 +93,9 @@
         storage.setJSONItem('triggerFilter', {
           unacknowlegedEvents: $('#unacknowlegedEvents').is(':checked'),
           skipDependent: $('#skipDependent').is(':checked')
+        });
+        storage.setJSONItem('common', {
+          updateInterval: $('#updateInterval').val()
         });
         win.close();
       });
