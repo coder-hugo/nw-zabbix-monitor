@@ -26,12 +26,18 @@
         </div>
       </div>
       <div class="panel panel-default">
-        <div class="panel-heading">Common stuff</div>
+        <div class="panel-heading">Trigger filter</div>
         <div class="panel-body">
           <div class="checkbox">
             <label>
               <input id="unacknowlegedEvents" type="checkbox" >
               Show only unacknowleged Events
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input id="skipDependent" type="checkbox" >
+              Don't show dependent triggers
             </label>
           </div>
         </div>
@@ -54,9 +60,10 @@
         $('#password').val(secrets.password);
       }
       secrets = null;
-      var commonStuff = storage.getJSONItem('commonStuff');
-      if (commonStuff) {
-        $('#unacknowlegedEvents').attr('checked', commonStuff.unacknowlegedEvents);
+      var triggerFilter = storage.getJSONItem('triggerFilter');
+      if (triggerFilter) {
+        $('#unacknowlegedEvents').attr('checked', triggerFilter.unacknowlegedEvents);
+        $('#skipDependent').attr('checked', triggerFilter.skipDependent);
       }
       $('#cancel').on('click', function() {
         win.close();
@@ -67,8 +74,9 @@
           username: $('#username').val(),
           password: $('#password').val()
         });
-        storage.setJSONItem('commonStuff', {
-          unacknowlegedEvents: $('#unacknowlegedEvents').is(':checked')
+        storage.setJSONItem('triggerFilter', {
+          unacknowlegedEvents: $('#unacknowlegedEvents').is(':checked'),
+          skipDependent: $('#skipDependent').is(':checked')
         });
         win.close();
       });
