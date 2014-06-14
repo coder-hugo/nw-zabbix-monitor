@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "node-json-rpc": ">= 0.0.1",
-    "node-localstorage": ">= 0.3.4"
+    "node-localstorage": ">= 0.3.4",
+    "moment": ">= 2.7.0"
   }
 }

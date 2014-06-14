@@ -9,44 +9,78 @@
   <div class="container-fluid" style="padding-top: 10px" id="container">
   </div>
   <style type="text/css">
-    /* FIXME add colorscheme for the diffent trigger priorities similar to the zabbix colorscheme */
+    .alert {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 4px;
+      margin-bottom: 4px;
+    }
+    .alert-not-classified {
+      border-color: #838383;
+      background-color: #e7e7e7;
+    }
+    .alert-information {
+      border-color: #54f7b6;
+      background-color: #c7ffb6;
+    }
+    .alert-warning {
+      border-color: #f7f754;
+      background-color: #fff18b;
+      color: #000000;
+    }
     .alert-average {
-      border-color: orange;
-      background-color: orange;
-      color: black;
+      border-color: #f7bd8b;
+      background-color: #ffd68b;
+    }
+    .alert-high {
+      border-color: #ee2a2a;
+      background-color: #ff6b6b;
+    }
+    .alert-disaster {
+      border-color: #da0000;
+      background-color: #ff3434;
     }
   </style>
   <script type="text/javascript">
     var zabbix = require('./lib/zabbix.js');
-    $(document).ready(function() {
-      var triggerList = $('#container');
-      triggerList.empty();
-      var triggers = zabbix.getTriggerCache();
-      if (triggers) {
-        triggers.forEach(function(trigger) {
-          var severityClass;
-          console.log(trigger.priority);
-          switch (trigger.priority) {
-            case '1':
-              severityClass = 'alert-information';
-              break;
-            case '2':
-              severityClass = 'alert-warning';
-              break;
-            case '3':
-              severityClass = 'alert-average';
-              break;
-            case '4':
-              severityClass = 'alert-high';
-              break;
-            case '5':
-              severityClass = 'alert-disaster';
-              break;
-          }
-          triggerList.append('<div class="alert ' + severityClass + '">' + trigger.description + '</div>');
-        });
-      }
-    });
+    var moment = require('moment');
+
+    var triggerList = $('#container');
+    triggerList.empty();
+    var triggers = zabbix.getTriggerCache();
+    if (triggers) {
+      triggers.forEach(function(trigger) {
+        var severityClass;
+        switch (trigger.priority) {
+          case '1':
+            severityClass = 'alert-information';
+            break;
+          case '2':
+            severityClass = 'alert-warning';
+            break;
+          case '3':
+            severityClass = 'alert-average';
+            break;
+          case '4':
+            severityClass = 'alert-high';
+            break;
+          case '5':
+            severityClass = 'alert-disaster';
+            break;
+          default:
+            severityClass = 'alert-not-classified';
+            break;
+        }
+        var triggerElement = $('<div>');
+        triggerElement.addClass('alert');
+        triggerElement.addClass(severityClass);
+        var content = trigger.hostname + ': ' + trigger.description + ' (' + moment(trigger.lastchange, 'X').format('YYYY-MM-DD HH:mm:ss') +')';
+        triggerElement.append(content);
+        triggerElement.attr('title', content);
+        triggerList.append(triggerElement);
+      });
+    }
   </script>
   </body>
 </html>
