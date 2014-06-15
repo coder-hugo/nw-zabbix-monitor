@@ -7,18 +7,41 @@
 
   <script type="text/javascript">
     var gui = require('nw.gui');
-    var win = gui.Window.get();
     var zabbix = require('./lib/zabbix.js');
     var secretsProvider = require('./lib/secrets.js');
-    var secrets = secretsProvider.loadSecrets();
     var storage = require('./lib/storage.js').storage;
+    var tray = require('./lib/tray.js');
+
+    var win = gui.Window.get();
+
+    var secrets = secretsProvider.loadSecrets();
     var triggerFilter = storage.getJSONItem('triggerFilter');
     var common = storage.getJSONItem('common');
+    
+    var triggerWin = gui.Window.open('html/triggers.html', {
+      show: false,
+      toolbar: false,
+      position: 'mouse'
+    });
+    triggerWin.on('close', function() {
+      this.hide();
+    });
+    
+    tray.init(gui);
+    tray.on('click', function() {
+      triggerWin.show();
+      triggerWin.focus();
+    });
+
     if (secrets && triggerFilter && common) {
       zabbix.connect(secrets.url, secrets.username, secrets.password, function() {
-        var triggerWin = gui.Window.open('html/triggers.html');
         var updateTriggers = function() { 
-          zabbix.retrieveTriggers(triggerFilter, function() {
+          zabbix.retrieveTriggers(triggerFilter, function(triggers) {
+            var maxPriority = 0;
+            triggers.forEach(function(trigger) {
+              maxPriority = trigger.priority > maxPriority ? trigger.priority : maxPriority;
+            });
+            tray.setPriority(maxPriority);
             triggerWin.reload();
           });
         };
@@ -28,10 +51,12 @@
     } else {
       gui.Window.open('html/settings.html');
     }
+
     win.on('close', function() {
       if (zabbix.isConnected()) {
         zabbix.disconnect();
       }
+      tray.remove();
       this.close(true);
     });
   </script>

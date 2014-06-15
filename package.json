@@ -10,7 +10,8 @@
     "height": 480,
     "position": "mouse",
     "min_width": 400,
-    "min_height": 200
+    "min_height": 200,
+    "show": false
   },
   "webkit": {
     "plugin": true,
